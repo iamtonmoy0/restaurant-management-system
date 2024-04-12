@@ -69,8 +69,8 @@ func CreateFood() gin.HandlerFunc {
 			return
 		}
 		// updating the time and price
-		food.Updated_at = time.Parse(time.RFC3339, time.Now()).Format(time.RFC3339)
-		food.Created_at = time.Parse(time.RFC3339, time.Now()).Format(time.RFC3339)
+		food.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		food.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		food.ID = primitive.NewObjectID()
 		food.Food_id = food.ID.Hex()
 		var num = toFixed(*food.Price, 2)
