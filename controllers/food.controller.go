@@ -90,10 +90,16 @@ func CreateFood() gin.HandlerFunc {
 
 }
 
+func round(num float64, precision int) float64 {
+}
+
+func toFixed(num float64, precision int) float64 {
+}
+
 // update food
 func UpdateFood() gin.HandlerFunc {
-	return func(c *gin.Context) {}
-}
-func round(num float64, precision int) float64 {
+	return func(c *gin.Context) {
+		
 
+	}
 }
