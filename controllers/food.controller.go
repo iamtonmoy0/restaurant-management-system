@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +25,15 @@ const validate = validator.New()
 // get all foods
 func GetFoods() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		recordPerPage, err := strconv.Atoi(c.Query("recordPerPage"))
+		if err != nil {
+			recordPerPage = 10
+		}
+		pageNumber, _ := strconv.Atoi(c.Query("page"))
+		if err != nil {
+			pageNumber = 1
+		}
 	}
 }
 
@@ -99,7 +108,6 @@ func toFixed(num float64, precision int) float64 {
 // update food
 func UpdateFood() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		
 
 	}
 }
