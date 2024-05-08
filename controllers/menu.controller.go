@@ -59,8 +59,8 @@ func GetMenu() gin.HandlerFunc {
 // create new Menu
 func CreateMenu() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var menu models.Menu
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		var menu models.Menu
 		if err := c.BindJSON(&menu); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
