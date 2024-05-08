@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/iamtonmoy0/restaurant-management-system/database"
+	"github.com/iamtonmoy0/restaurant-management-system/models"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -35,7 +36,20 @@ func GetOrders() gin.HandlerFunc {
 
 // get Order
 func GetOrder() gin.HandlerFunc {
-	return func(c *gin.Context) {}
+	return func(c *gin.Context) {
+
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		orderId := c.Param("order_id")
+		var order models.Order
+
+		err := orderCollection.FindOne(ctx, bson.M{"order_id": orderId}).Decode(&order)
+		defer cancel()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, order)
+
+	}
 }
 
 // create new Order
