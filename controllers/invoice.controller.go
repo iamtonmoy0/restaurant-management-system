@@ -1,11 +1,15 @@
 package controllers
 
 import (
+	"context"
+	"log"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/iamtonmoy0/restaurant-management-system/database"
 	"go.mongodb.org/mongo-driver/mongo"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type InvoiceViewFormat struct {
@@ -21,10 +25,23 @@ type InvoiceViewFormat struct {
 
 var invoiceCollection *mongo.Collection = database.OpenCollection(database.Client, "invoice")
 
-// TODO: need to work on invoice controller 
 // get all invoice
 func GetInvoices() gin.HandlerFunc {
-	return func(c *gin.Context) {}
+	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+		result, err := invoiceCollection.Find(context.TODO(), bson.M{})
+		defer cancel()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing invoice items"})
+		}
+
+		var allInvoices []bson.M
+		if err = result.All(ctx, &allInvoices); err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, allInvoices)
+	}
 }
 
 // get invoice
