@@ -10,14 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/iamtonmoy0/restaurant-management-system/database"
 	"github.com/iamtonmoy0/restaurant-management-system/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"gopkg.in/mgo.v2/bson"
 )
 
 var orderCollection *mongo.Collection = database.OpenCollection(database.Client, "order")
-var tableCollection *mongo.Collection = database.OpenCollection(database.Client, "table")
 
 // get all Order
 func GetOrders() gin.HandlerFunc {

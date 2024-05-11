@@ -12,10 +12,10 @@ import (
 	"github.com/iamtonmoy0/restaurant-management-system/database"
 	helper "github.com/iamtonmoy0/restaurant-management-system/helpers"
 	"github.com/iamtonmoy0/restaurant-management-system/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
-	"gopkg.in/mgo.v2/bson"
 )
 
 var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
@@ -36,7 +36,7 @@ func GetUsers() gin.HandlerFunc {
 		}
 		// start index/ skip data par page
 		startIndex := (page - 1) * recordPerPage
-		startIndex, err := strconv.Atoi(c.Query("startIndex"))
+		startIndex, err = strconv.Atoi(c.Query("startIndex"))
 
 		matchStage := bson.D{{"$match", bson.D{{}}}}
 		projectStage := bson.D{
