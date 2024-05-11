@@ -9,10 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/iamtonmoy0/restaurant-management-system/database"
 	"github.com/iamtonmoy0/restaurant-management-system/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type OrderItemPack struct {
@@ -152,7 +152,7 @@ func CreateOrderItem() gin.HandlerFunc {
 			return
 		}
 
-		order.Order_Date, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		order.Order_date, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 
 		orderItemsToBeInserted := []interface{}{}
 		order.Table_id = orderItemPack.Table_id

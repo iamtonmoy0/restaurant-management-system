@@ -120,20 +120,19 @@ func UpdateMenu() gin.HandlerFunc {
 		updateObj = append(updateObj, bson.E{"end_date", menu.End_date})
 		// name
 		if menu.Name != "" {
-			updateObj = append(updateObj, bson.E{"name": menu.Name})
+			updateObj = append(updateObj, bson.E{"name", menu.Name})
 		}
 		// category
 		if menu.Category != "" {
-			updateObj = append(updateObj, bson.E{"category": menu.Category})
+			updateObj = append(updateObj, bson.E{"category", menu.Category})
 		}
 		// time
 		menu.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-		updateObj = append(updateObj, bson.E{"updated_at": menu.Updated_at})
+		updateObj = append(updateObj, bson.E{"updated_at", menu.Updated_at})
 
 		upsert := true
-		opt := options.UpdateOptions{
-			Upsert: &upsert,
-		}
+		opt := options.Update() // Change to options.Update() to get a pointer
+		opt.SetUpsert(upsert)
 		result, err := menuCollection.UpdateOne(ctx, filter, bson.D{{"$set", updateObj}}, opt)
 		if err != nil {
 			msg := "failed to update "
