@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -9,7 +10,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/iamtonmoy0/restaurant-management-system/database"
+	helper "github.com/iamtonmoy0/restaurant-management-system/helpers"
 	"github.com/iamtonmoy0/restaurant-management-system/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -79,19 +82,68 @@ func GetUser() gin.HandlerFunc {
 // sign up
 func SignUp() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		var user models.User
 		// convert the data
+		if err := c.BindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 
 		// validate data based on user struct
-
+		validationErr := validate.Struct(user)
+		if validationErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+			return
+		}
 		// check if email already in use or not
-
+		count, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
+		defer cancel()
+		if err != nil {
+			log.Panic(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while checking for the email"})
+			return
+		}
 		// hash password
+		password := HashPassword(*user.Password)
+		user.Password = &password
+		// checking is phone number exist or not
+		count, err = userCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
+		defer cancel()
+		if err != nil {
+			log.Panic(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while checking for the phone number"})
+			return
+		}
 
-		// create details like createdAt and Updated At
+		if count > 0 {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "this email or phone number already exsits"})
+			return
+		}
+
+		//create some extra details for the user object - created_at, updated_at, ID
+
+		user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		user.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		user.ID = primitive.NewObjectID()
+		user.User_id = user.ID.Hex()
 
 		// generate token and refresh token
 
-		// insert data to db
+		token, refreshToken, _ := helper.GenerateAllTokens(*user.Email, *user.First_name, *user.Last_name, user.User_id)
+		user.Token = &token
+		user.Refresh_token = &refreshToken
+		// insert db
+		resultInsertionNumber, insertErr := userCollection.InsertOne(ctx, user)
+		if insertErr != nil {
+			msg := fmt.Sprintf("User item was not created")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+		defer cancel()
+		//return status OK and send the result back
+
+		c.JSON(http.StatusOK, resultInsertionNumber)
 	}
 }
 

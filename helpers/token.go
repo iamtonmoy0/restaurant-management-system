@@ -5,4 +5,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var user *mongo.Collection = database.OpenCollection(database.Client, "user")
+var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
+
+func GenerateAllTokens(email string, firstName string, lastName string, uid string) (signedToken string, signedRefreshToken string, err error) {
+	return
+}
