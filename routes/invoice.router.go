@@ -1,5 +1,13 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/iamtonmoy0/restaurant-management-system/controllers"
+)
 
-func InvoiceRoutes(router *gin.Engine){}
+func InvoiceRoutes(incomingRoutes *gin.Engine) {
+	incomingRoutes.GET("/invoices", controllers.GetInvoices())
+	incomingRoutes.GET("/invoices/:invoice_id", controllers.GetInvoice())
+	incomingRoutes.POST("/invoices", controllers.CreateInvoice())
+	incomingRoutes.PATCH("/invoices/:invoice_id", controllers.UpdateInvoice())
+}
